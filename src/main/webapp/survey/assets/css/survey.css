@@ -1,0 +1,23 @@
+:root { color: #333; font-family: Arial, sans-serif; font-size: 13px; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #fff; }
+.survey-page { width: min(100% - 32px, 440px); margin: 18px 25px; }
+.avatar { display: block; width: 78px; height: 62px; margin-bottom: 10px; object-fit: contain; }
+h1, h2, legend { color: #087f83; }
+h1 { margin: 8px 0; font-size: 23px; }
+h2, legend { margin: 14px 0 10px; font-size: 16px; font-weight: bold; }
+p { margin: 0 0 10px; line-height: 1.25; }
+.form-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.form-row > label { flex: 0 0 115px; font-weight: bold; }
+input[type="text"], input[type="email"], input[type="date"], select { min-width: 0; height: 24px; border: 1px solid #bbb; border-radius: 2px; }
+input[type="text"], input[type="email"], input[type="date"] { flex: 1; }
+fieldset { margin: 0 0 14px; padding: 0; border: 0; }
+fieldset legend { padding: 0; }
+.option-list { display: flex; flex-direction: column; gap: 8px; }
+.option-list--inline { flex-direction: row; flex-wrap: wrap; }
+.option-list label { white-space: nowrap; }
+input[type="radio"], input[type="checkbox"] { margin: 0 5px 0 0; }
+button { padding: 4px 10px; font-size: 14px; }
+.summary { margin: 18px 0; padding: 0; list-style: none; }
+.summary li { margin-bottom: 8px; }
+@media (max-width: 480px) { .survey-page { margin: 18px auto; } .form-row { align-items: stretch; flex-direction: column; gap: 4px; } .form-row > label { flex-basis: auto; } }
