@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: email-servlet
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /

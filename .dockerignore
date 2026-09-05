@@ -1,0 +1,10 @@
+.git
+.github
+.idea
+.vscode
+.maven
+.mvn
+target
+*.iml
+README.md
+run-email.ps1
