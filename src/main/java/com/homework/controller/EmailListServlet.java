@@ -1,6 +1,6 @@
 package com.homework.controller;
 
-import jakarta.mail.MessagingException;
+import com.resend.core.exception.ResendException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,7 +62,7 @@ public class EmailListServlet extends HttpServlet {
                         "emailMessage",
                         "Welcome email sent successfully."
                 );
-            } catch (MessagingException exception) {
+            } catch (ResendException exception) {
                 log("Unable to send email to " + emailAddress, exception);
                 request.setAttribute(
                         "emailMessage",

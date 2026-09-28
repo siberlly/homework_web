@@ -32,19 +32,20 @@ Project đã có sẵn `Dockerfile` và `render.yaml` để deploy dưới dạn
 
 Ứng dụng chạy tại root URL (`/`), không cần thêm `/email-servlet`.
 
-## Gửi email bằng Gmail
+## Gửi email bằng Resend
 
-Ứng dụng đọc tài khoản Gmail và App Password từ biến môi trường. Đặt hai
-biến sau trong cùng cửa sổ PowerShell trước khi chạy ứng dụng:
+Ứng dụng dùng Resend HTTPS API để gửi email. Đặt API key trong cùng cửa sổ
+PowerShell trước khi chạy ứng dụng:
 
 ```powershell
-$env:SMTP_USERNAME = "your-account@gmail.com"
-$env:SMTP_PASSWORD = "your-google-app-password"
+$env:RESEND_API_KEY = "re_your_api_key"
+$env:RESEND_FROM = "Email Servlet <onboarding@resend.dev>"
 .\run-email.ps1
 ```
 
-Không dùng mật khẩu Gmail thông thường và không ghi App Password trực tiếp
-vào source code.
+Không ghi API key trực tiếp vào source code. Sender `onboarding@resend.dev`
+phù hợp để thử nghiệm. Để gửi production, hãy xác minh domain trong Resend và
+đổi `RESEND_FROM`, ví dụ `Email Servlet <noreply@example.com>`.
 
 ## Kiến trúc 3 lớp và JPA
 
@@ -66,16 +67,12 @@ Các bước deploy:
 
 1. Push source code lên GitHub hoặc GitLab.
 2. Trên Render, chọn **New > Blueprint** và chọn repository.
-3. Nhập `SMTP_USERNAME` và `SMTP_PASSWORD` khi Render yêu cầu. Không lưu hai
-   giá trị này trong `render.yaml`.
+3. Nhập `RESEND_API_KEY` khi Render yêu cầu. Không lưu API key trong
+   `render.yaml`.
 4. Render build image, tạo PostgreSQL và kiểm tra endpoint `/health`.
 
 Khi không có `DATABASE_URL`, ứng dụng dùng H2 local. Khi Render cung cấp
 `DATABASE_URL`, ứng dụng tự chuyển sang PostgreSQL.
 
-Lưu ý về gói Free của Render:
-
-- Web Service Free chặn outbound SMTP trên port 25, 465 và 587, do đó Gmail
-  SMTP không gửi được. Cần nâng Web Service lên gói trả phí hoặc thay Gmail
-  SMTP bằng một email API chạy qua HTTPS.
-- PostgreSQL Free hết hạn sau 30 ngày và không có backup.
+Resend dùng HTTPS nên hoạt động trên Render Free. PostgreSQL Free hết hạn sau
+30 ngày và không có backup.

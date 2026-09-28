@@ -1,8 +1,8 @@
 package murach.business;
 
-import jakarta.mail.MessagingException;
+import com.resend.core.exception.ResendException;
 import murach.data.UserRepository;
-import murach.util.MailUtilGmail;
+import murach.util.MailUtilResend;
 
 public class UserService {
     private final UserRepository userRepository;
@@ -24,8 +24,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void sendWelcomeEmail(User user) throws MessagingException {
-        String from = System.getenv("SMTP_USERNAME");
+    public void sendWelcomeEmail(User user) throws ResendException {
         String subject = "Welcome to our email list";
         String body = "Dear " + user.getFirstName() + ",\n\n"
                 + "Thanks for joining our email list.\n"
@@ -33,9 +32,8 @@ public class UserService {
                 + "and promotions.\n\n"
                 + "Have a great day!";
 
-        MailUtilGmail.sendMail(
+        MailUtilResend.sendMail(
                 user.getEmail(),
-                from,
                 subject,
                 body,
                 false
