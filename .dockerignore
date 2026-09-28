@@ -5,6 +5,7 @@
 .maven
 .mvn
 target
+data
 *.iml
 README.md
 run-email.ps1

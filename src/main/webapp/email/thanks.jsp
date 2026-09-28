@@ -7,6 +7,7 @@
 <span>${user.firstName}</span><br>
 <label>Last Name:</label>
 <span>${user.lastName}</span><br>
+<p><strong>${emailMessage}</strong></p>
 <p>To enter another email address, click on the Back
 button in your browser or the Return button shown
 below.</p>
