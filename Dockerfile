@@ -6,7 +6,7 @@ COPY src ./src
 RUN mvn -B -DskipTests clean package
 
 FROM jetty:12.0.25-jre17-eclipse-temurin
-RUN java -jar "$JETTY_HOME/start.jar" --add-modules=ee10-deploy
+RUN java -jar "$JETTY_HOME/start.jar" --add-modules=ee10-deploy,ee10-jsp
 COPY --from=build /app/target/email-servlet.war /var/lib/jetty/webapps/ROOT.war
 
 EXPOSE 10000
