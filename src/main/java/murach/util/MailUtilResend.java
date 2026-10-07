@@ -17,13 +17,15 @@ public final class MailUtilResend {
             String body,
             boolean bodyIsHTML) throws ResendException {
 
-        String apiKey = System.getenv("RESEND_API_KEY");
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new ResendException("Chua cau hinh bien RESEND_API_KEY.");
+        String apiKey = MailConfig.resendApiKey();
+        if (apiKey == null) {
+            throw new ResendException(
+                    "Chua cau hinh RESEND_API_KEY. Dat bien moi truong "
+                            + "hoac them vao config.properties.");
         }
 
-        String from = System.getenv("RESEND_FROM");
-        if (from == null || from.isBlank()) {
+        String from = MailConfig.resendFrom();
+        if (from == null) {
             from = DEFAULT_FROM;
         }
 

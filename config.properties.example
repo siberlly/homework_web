@@ -1,0 +1,8 @@
+# Copy this file to config.properties and fill in your Resend settings.
+# config.properties is git-ignored and docker-ignored, so it never gets
+# committed or baked into the deployed image.
+#
+# You can also set these as environment variables instead (that is what Render
+# uses); environment variables take precedence over this file.
+RESEND_API_KEY=re_your_api_key
+RESEND_FROM=Email Servlet <onboarding@resend.dev>
