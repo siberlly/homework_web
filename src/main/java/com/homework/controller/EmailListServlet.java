@@ -1,6 +1,5 @@
 package com.homework.controller;
 
-import com.resend.core.exception.ResendException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import murach.business.User;
 import murach.business.UserService;
 import murach.data.UserRepository;
+import murach.util.MailException;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -62,7 +62,7 @@ public class EmailListServlet extends HttpServlet {
                         "emailMessage",
                         "Welcome email sent successfully."
                 );
-            } catch (ResendException exception) {
+            } catch (MailException exception) {
                 log("Unable to send email to " + emailAddress, exception);
                 request.setAttribute(
                         "emailMessage",

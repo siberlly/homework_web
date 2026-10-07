@@ -4,4 +4,4 @@ target/
 .maven/
 *.iml
 /data/
-config.properties
+.env

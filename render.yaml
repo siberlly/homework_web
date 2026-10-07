@@ -11,10 +11,10 @@ services:
         fromDatabase:
           name: email-postgres
           property: connectionString
-      - key: RESEND_API_KEY
+      - key: BREVO_API_KEY
         sync: false
-      - key: RESEND_FROM
-        value: Email Servlet <onboarding@resend.dev>
+      - key: MAIL_FROM
+        sync: false
 
 databases:
   - name: email-postgres

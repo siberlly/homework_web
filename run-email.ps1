@@ -20,6 +20,31 @@ function Stop-ProjectJetty {
     }
 }
 
+function Import-DotEnv {
+    param([string]$Path)
+
+    if (-not (Test-Path $Path)) {
+        return
+    }
+
+    Get-Content $Path | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -eq "" -or $line.StartsWith("#")) {
+            return
+        }
+        $separator = $line.IndexOf("=")
+        if ($separator -lt 1) {
+            return
+        }
+        $name = $line.Substring(0, $separator).Trim()
+        $value = $line.Substring($separator + 1).Trim()
+        if ($value.Length -ge 2 -and $value.StartsWith('"') -and $value.EndsWith('"')) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
+        [Environment]::SetEnvironmentVariable($name, $value, "Process")
+    }
+}
+
 if (-not (Test-Path $mavenPath)) {
     $mavenCommand = Get-Command mvn.cmd -ErrorAction SilentlyContinue
     if ($null -eq $mavenCommand) {
@@ -30,6 +55,7 @@ if (-not (Test-Path $mavenPath)) {
 
 Push-Location $projectPath
 try {
+    Import-DotEnv (Join-Path $projectPath ".env")
     Stop-ProjectJetty
 
     Write-Host "Đang compile và đóng gói ứng dụng..." -ForegroundColor Cyan

@@ -9,4 +9,4 @@ target
 *.iml
 README.md
 run-email.ps1
-config.properties
+.env

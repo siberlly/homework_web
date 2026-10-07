@@ -4,7 +4,7 @@ Project Jakarta Servlet 6 chạy trên Java 17, đóng gói thành WAR `email-se
 Ứng dụng gồm hai module:
 
 - **Email**: form đăng ký nhận tin, lưu người đăng ký vào database và gửi email
-  chào mừng qua Resend.
+  chào mừng qua Brevo.
 - **Survey**: form khảo sát tiếng Việt, lưu câu trả lời trong session và hiển thị
   trang tổng kết.
 
@@ -28,6 +28,54 @@ mvn clean package
 
 File WAR được tạo tại `target/email-servlet.war`.
 
+## Cấu hình gửi email (Brevo)
+
+Ứng dụng gửi email qua **Brevo HTTP API** (`https://api.brevo.com/v3/smtp/email`).
+Brevo dùng HTTPS (cổng 443) nên hoạt động trên Render free, khác với Gmail SMTP
+(bị Render chặn cổng 25/465/587).
+
+Cấu hình được đọc từ **biến môi trường** (không lưu trong source code):
+
+- `BREVO_API_KEY`: API key tạo tại https://app.brevo.com/settings/keys/api
+- `MAIL_FROM`: sender **đã xác minh trong Brevo**, định dạng `Tên <email>`.
+  Gmail cũng dùng được, ví dụ `Email Servlet <you@gmail.com>`.
+
+Hai biến này được đọc theo thứ tự ưu tiên: **system property** (`-DBREVO_API_KEY=...`)
+trước, rồi tới **biến môi trường**.
+
+### Chạy local
+
+Tạo file `.env` từ mẫu rồi điền giá trị:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+```dotenv
+BREVO_API_KEY=xkeysib-your-api-key
+MAIL_FROM=Email Servlet <you@gmail.com>
+```
+
+`run-email.ps1` sẽ tự nạp `.env` khi khởi động. File `.env` đã được bỏ qua bởi
+Git và Docker nên key không bị commit hay đóng gói vào image.
+
+Hoặc set biến môi trường trực tiếp trong cửa sổ PowerShell:
+
+```powershell
+$env:BREVO_API_KEY = "xkeysib-your-api-key"
+$env:MAIL_FROM = "Email Servlet <you@gmail.com>"
+```
+
+### Trên Render
+
+Khai báo `BREVO_API_KEY` và `MAIL_FROM` trong phần Environment của Web Service
+(`render.yaml` đã đánh dấu `sync: false` để Render hỏi khi deploy). Không cần
+`.env` trên Render.
+
+Sau khi xác minh sender, Brevo cho phép gửi tới **mọi địa chỉ email** (gói free
+300 email/ngày). Gửi từ địa chỉ Gmail có thể vào hộp thư spam; muốn deliverability
+tốt hơn hãy xác minh một domain riêng trong Brevo rồi đổi `MAIL_FROM`.
+
 ## Chạy local
 
 Cách nhanh nhất:
@@ -36,50 +84,14 @@ Cách nhanh nhất:
 .\run-email.ps1
 ```
 
-Script sẽ build, giải phóng cổng 8080 nếu còn Jetty cũ và chạy ứng dụng tại
-`http://localhost:8080/`.
+Script sẽ nạp `.env`, build, giải phóng cổng 8080 nếu còn Jetty cũ và chạy ứng
+dụng tại `http://localhost:8080/`.
 
-Hoặc chạy trực tiếp bằng Maven:
+Hoặc chạy trực tiếp bằng Maven (khi đó phải tự set biến môi trường):
 
 ```powershell
 mvn jetty:run
 ```
-
-## Cấu hình Resend (gửi email)
-
-Ứng dụng gửi email qua Resend HTTPS API. API key được đọc theo thứ tự ưu tiên:
-
-1. System property (`-DRESEND_API_KEY=...`)
-2. Biến môi trường `RESEND_API_KEY`
-3. File `config.properties` ở thư mục chạy ứng dụng
-
-**Cách dễ nhất khi chạy local:** copy file mẫu rồi điền key:
-
-```powershell
-Copy-Item config.properties.example config.properties
-```
-
-Mở `config.properties` và sửa:
-
-```properties
-RESEND_API_KEY=re_your_api_key
-RESEND_FROM=Email Servlet <onboarding@resend.dev>
-```
-
-File `config.properties` đã được bỏ qua bởi Git và Docker, nên key không bị
-commit hay đóng gói vào image.
-
-Nếu không dùng file, có thể đặt biến môi trường trước khi chạy:
-
-```powershell
-$env:RESEND_API_KEY = "re_your_api_key"
-$env:RESEND_FROM = "Email Servlet <onboarding@resend.dev>"
-.\run-email.ps1
-```
-
-Không ghi API key trực tiếp vào source code. Sender `onboarding@resend.dev` chỉ
-để thử nghiệm; muốn gửi production hãy xác minh domain trong Resend rồi đổi
-`RESEND_FROM`, ví dụ `Email Servlet <noreply@example.com>`.
 
 ## Kiến trúc và JPA
 
@@ -97,8 +109,7 @@ Project đã có sẵn `Dockerfile` và `render.yaml` để deploy dưới dạn
 
 1. Push source code lên GitHub/GitLab.
 2. Trên Render, chọn **New > Blueprint** và chọn repository.
-3. Nhập `RESEND_API_KEY` khi Render yêu cầu (được khai báo `sync: false` nên
-   Render sẽ hỏi, không lưu key trong `render.yaml`).
+3. Nhập `BREVO_API_KEY` và `MAIL_FROM` khi Render yêu cầu.
 4. Render build image, tạo PostgreSQL và kiểm tra endpoint `/health`.
 
 `render.yaml` tạo hai tài nguyên trong cùng region Singapore:
@@ -106,5 +117,4 @@ Project đã có sẵn `Dockerfile` và `render.yaml` để deploy dưới dạn
 - Web Service chạy Docker (tự nhận biến `PORT` do Render cấp).
 - PostgreSQL database được truyền vào ứng dụng qua `DATABASE_URL`.
 
-Lưu ý: Resend dùng HTTPS nên hoạt động trên gói Render Free. PostgreSQL Free hết
-hạn sau 30 ngày và không có backup.
+Lưu ý: PostgreSQL Free hết hạn sau 30 ngày và không có backup.
